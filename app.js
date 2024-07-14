@@ -10,7 +10,27 @@ let phoneBook = require("./data/data.json");
 const app = express();
 
 app.use(express.json());
-app.use(morgan("tiny"));
+
+morgan.token("body", (req) =>
+  req.method === "POST" ? JSON.stringify(req.body) : null,
+);
+app.use(
+  morgan((tokens, req, res) => {
+    const body = tokens.body(req, res);
+    return [
+      tokens.method(req, res),
+      tokens.url(req, res),
+      tokens.status(req, res),
+      tokens.res(req, res, "content-length"),
+      "-",
+      tokens["response-time"](req, res),
+      "ms",
+      body ? body : "",
+    ]
+      .join(" ")
+      .trim();
+  }),
+);
 
 app
   .route("/api/persons")
