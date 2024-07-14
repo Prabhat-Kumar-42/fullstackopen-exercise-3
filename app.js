@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { DateTime } = require("luxon");
+const morgan = require("morgan");
 const { getRandomInt } = require("./services/bigRandomNumber");
 const express = require("express");
 
@@ -9,6 +10,7 @@ let phoneBook = require("./data/data.json");
 const app = express();
 
 app.use(express.json());
+app.use(morgan("tiny"));
 
 app
   .route("/api/persons")
