@@ -12,6 +12,7 @@ const app = express();
 
 app.use(express.json());
 app.use(corsMiddleware);
+app.use(express.static("./dist/"));
 
 morgan.token("body", (req) =>
   ["POST", "PUT"].includes(req.method) ? JSON.stringify(req.body) : null,
