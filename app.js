@@ -6,13 +6,15 @@ const express = require("express");
 
 // taking phonebook data from the specified file
 let phoneBook = require("./data/data.json");
+const { corsMiddleware } = require("./middeware/cors.middleware");
 
 const app = express();
 
 app.use(express.json());
+app.use(corsMiddleware);
 
 morgan.token("body", (req) =>
-  req.method === "POST" ? JSON.stringify(req.body) : null,
+  ["POST", "PUT"].includes(req.method) ? JSON.stringify(req.body) : null,
 );
 app.use(
   morgan((tokens, req, res) => {
@@ -56,7 +58,7 @@ app
     if (personExists) {
       return res.status(400).json({ error: "Name must be unique" });
     }
-    const id = getRandomInt();
+    const id = String(getRandomInt());
     const name = newPerson.name;
     const number = newPerson.number;
     const newPersonData = {
@@ -65,7 +67,7 @@ app
       number,
     };
     phoneBook.push(newPersonData);
-    return res.status(201).json({ msg: "success" });
+    return res.status(201).json(newPersonData);
   });
 
 app
@@ -80,8 +82,30 @@ app
   })
   .delete((req, res) => {
     const id = req.params.id;
-    phoneBook = phoneBook.filter((person) => person.id != id);
-    return res.json({ msg: "success" });
+    const requestedPerson = phoneBook.find((person) => person.id === id);
+    if (!requestedPerson) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    phoneBook = phoneBook.filter((person) => person.id !== requestedPerson.id);
+    return res.json(requestedPerson);
+  })
+  .put((req, res) => {
+    if (!req.body) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    const id = req.params.id;
+    const newNumber = req.body.number;
+    if (!id || !newNumber) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    const requestedPersonIndex = phoneBook.findIndex(
+      (person) => person.id === id,
+    );
+    if (requestedPersonIndex == -1) {
+      return res.status(404).json({ error: "Not found" });
+    }
+    phoneBook[requestedPersonIndex].number = newNumber;
+    return res.json(phoneBook[requestedPersonIndex]);
   });
 
 app.route("/info").get((req, res) => {
