@@ -1,3 +1,5 @@
+// ESLint Config
+
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import js from "@eslint/js";
