@@ -26,22 +26,10 @@ const handleGetUser = async (req, res, next) => {
 const handleCreateUser = async (req, res, next) => {
   try {
     const newPerson = req.body;
-    if (!newPerson || !newPerson.name || !newPerson.number) {
-      throwError(400, "name and number are required field");
-    }
-    const personExists = await PERSON.findOne({ name: newPerson.name });
-
-    if (personExists) {
-      throwError(400, "Name must be unique");
-    }
-
-    const name = newPerson.name;
-    const number = newPerson.number;
-    const newPersonData = await PERSON.create({
-      name,
-      number,
-    });
-    return res.status(201).json(newPersonData);
+    const error = new PERSON(newPerson).validateSync();
+    if (error) throw error;
+    const createdPersons = await PERSON.create(newPerson);
+    return res.status(201).json(createdPersons);
   } catch (error) {
     next(error);
   }
@@ -49,18 +37,18 @@ const handleCreateUser = async (req, res, next) => {
 
 const handleUpdateUser = async (req, res, next) => {
   try {
-    if (!req.body) {
+    const id = req.params.id;
+    if (!id || !req.body) {
       throwError(404, "Not Found");
     }
-    const id = req.params.id;
     const newNumber = req.body.number;
-    if (!id || !newNumber) {
-      throwError(404, "Not Found");
+    if (!newNumber) {
+      throwError(400, "number is Required");
     }
     const requestedPerson = await PERSON.findByIdAndUpdate(
       id,
       { number: newNumber },
-      { new: true },
+      { new: true, runValidators: true },
     );
     if (!requestedPerson) {
       throwError(404, "Not Found");
@@ -76,9 +64,9 @@ const handleDeleteUser = async (req, res, next) => {
     const id = req.params.id;
     const requestedPerson = await PERSON.findByIdAndDelete(id);
     if (!requestedPerson) {
-      throwError(404, "Not Found");
+      return res.status(204).end();
     }
-    return res.json(requestedPerson);
+    return res.status(200).json(requestedPerson);
   } catch (error) {
     next(error);
   }
