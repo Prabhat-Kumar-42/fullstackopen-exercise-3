@@ -1,22 +1,21 @@
 const { throwError } = require("../services/throwError");
 
 const unknownEndpoint = (req, res, next) => {
-  try {
-    throwError(404, "unknown endpoint");
-  } catch (error) {
-    next(error);
-  }
+  throwError(404, "unknown endpoint");
+  next(err);
 };
 
-const castError = (err, req, res, next) => {
-  try {
-    if (err.name === "CastError") {
-      throwError(400, "malformatted id");
-    }
-    next(err);
-  } catch (err) {
-    next(err);
+const mongoError = (err, req, res, next) => {
+  if (err.name === "CastError") {
+    throwError(400, "malformatted id");
   }
+  if (err.name === "ValidationError") {
+    throwError(400, err.message);
+  }
+  if (err.name === "MongoServerError" && err.code === 11000) {
+    throwError(400, "name must be unique");
+  }
+  next(err);
 };
 
 const errorHandler = (err, req, res, next) => {
@@ -28,6 +27,6 @@ const errorHandler = (err, req, res, next) => {
 
 module.exports = {
   unknownEndpoint,
-  castError,
+  mongoError,
   errorHandler,
 };
