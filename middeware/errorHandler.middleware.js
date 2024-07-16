@@ -21,11 +21,15 @@ const mongoError = (err, req, res, next) => {
   next(err);
 };
 
-const errorHandler = (err, req, res) => {
-  const statusCode = err.status || 500;
-  if (statusCode >= 500) console.error(err.stack);
-  const message = err.message || "Internal Server Error";
-  res.status(statusCode).json({ error: message });
+const errorHandler = (err, req, res, next) => {
+  try {
+    const statusCode = err.status || 500;
+    if (statusCode >= 500) console.error(err.stack);
+    const message = err.message || "Internal Server Error";
+    return res.status(statusCode).json({ error: message });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports = {
