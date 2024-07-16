@@ -8,7 +8,7 @@ const { connectMongo } = require("./db/mongo.db.js");
 const {
   errorHandler,
   unknownEndpoint,
-  castError,
+  mongoError,
 } = require("./middeware/errorHandler.middleware.js");
 
 connectMongo();
@@ -25,9 +25,9 @@ app.use(morganMiddeware);
 app.use("/api", personApiRouter);
 app.use("/info", infoRouter);
 
-//Error Handler
+//Error Handlers
 app.use(unknownEndpoint);
-app.use(castError);
+app.use(mongoError);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
