@@ -1,4 +1,4 @@
-## Exercise 3.1 - 3.11 Solutions
+## Exercise 3.1 - 3.22 Solutions
 
 ### Hosted On Rendar:
 
