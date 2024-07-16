@@ -5,9 +5,9 @@ const connectMongo = async () => {
   try {
     await mongoose.connect(MONGO_URL);
     console.log("connected to db successfully");
-  } catch (error) {
+  } catch (err) {
     console.log(`error: ${err.message}`);
-    console.log(`connection to db failed`);
+    console.log("connection to db failed");
   }
 };
 module.exports = { connectMongo };

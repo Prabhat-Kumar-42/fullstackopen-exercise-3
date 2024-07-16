@@ -4,7 +4,7 @@ if (process.argv.length < 3) {
   console.log("password required");
   process.exit(1);
 }
-if (process.argv.length == 4) {
+if (process.argv.length === 4) {
   console.log("name and number are required field");
   process.exit(1);
 }

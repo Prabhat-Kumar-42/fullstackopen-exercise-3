@@ -1,8 +1,11 @@
 const { throwError } = require("../services/throwError");
 
 const unknownEndpoint = (req, res, next) => {
-  throwError(404, "unknown endpoint");
-  next(err);
+  try {
+    throwError(404, "unknown endpoint");
+  } catch (err) {
+    next(err);
+  }
 };
 
 const mongoError = (err, req, res, next) => {
@@ -18,7 +21,7 @@ const mongoError = (err, req, res, next) => {
   next(err);
 };
 
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res) => {
   const statusCode = err.status || 500;
   if (statusCode >= 500) console.error(err.stack);
   const message = err.message || "Internal Server Error";
