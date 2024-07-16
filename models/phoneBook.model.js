@@ -1,9 +1,21 @@
 const mongoose = require("mongoose");
+const { numberValidator } = require("../services/numberValidator");
 
 const personSchema = new mongoose.Schema({
-  id: String,
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: [3, "name must be at least 3 characters long"],
+    required: [true, "name is required"],
+    unique: true,
+  },
+  number: {
+    type: String,
+    validate: {
+      validator: numberValidator,
+      message: (props) => `${props.value} is not a valid number`,
+    },
+    required: [true, "number is required"],
+  },
 });
 
 personSchema.set("toJSON", {
